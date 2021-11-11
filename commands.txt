@@ -1,0 +1,3 @@
+// export mongo data to csv from command line.
+
+mongoexport --db=recko --collection=places --out=text.csv --csv --fields=placeId,placeName

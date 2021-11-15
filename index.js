@@ -30,7 +30,10 @@ mongodb.MongoClient.connect(url, {
         for (var i = 0; i < source.length; i++) {
 
 
-            // change tag names to tagids then populate tag flags
+            // change tag names to tagids then populate tag flags. set all to zero first.
+            for (tag in categories.tagIds) {
+                source[i][categories.tagIds[tag]] = 0;
+            }
             source[i][categories.tagIds[source[i]["tag1"]]] = 1;
             source[i][categories.tagIds[source[i]["tag2"]]] = 1;
             source[i][categories.tagIds[source[i]["tag3"]]] = 1;

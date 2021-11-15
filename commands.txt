@@ -1,3 +1,8 @@
 // export mongo data to csv from command line.
 
 mongoexport --db=recko --collection=places --out=text.csv --csv --fields=placeId,placeName
+
+// copy from db to db
+// local - mongodb://localhost/recko
+
+mongodump --uri="mongodb://$sourceUser:$sourcePwd@$sourceHost/$sourceDb" --gzip --archive | mongorestore --uri="mongodb://$targetUser:$targetPwd@$targetHost/$targetDb" --nsFrom="$sourceDb.*" --nsTo="$targetDb.*" --gzip --archive

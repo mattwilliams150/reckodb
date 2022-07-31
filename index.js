@@ -3,7 +3,7 @@ const csvtojson = require('csvtojson');
 const mongoose = require('mongoose');
 require("dotenv").config()
 const categories = require('../recko/config/categories.json')
-const Places = require('./models/places');
+const Places = require('./models/places.js');
 
 //connect to the database using mongoose
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -15,7 +15,7 @@ mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology
 		var arrayToInsert = [];
 
 
-		csvtojson().fromFile(fileName).then(source => {
+		csvtojson().fromFile(fileName).then(async (source) => {
 			// Fetching the all data from each row
 			let t = 1;
 			for (var i = 0; i < source.length; i++) {
@@ -30,65 +30,55 @@ mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology
 						tags[tag] = 0;
 					}
 				}
-				tags["number"] = t;
+
+				let location = "unknown"
+				if (source[i]["sw4"] == 1) {
+					location = "Clapham"
+				} else if (source[i]["sw11"] == 1) {
+					location = "Clapham Junction & Battersea"
+				} else if (source[i]["sw12"] == 1) {
+					location = "Clapham South & Balham"
+				}
+
+				var oneRow = {
+					placeId: source[i]["placeId"],
+					photo: source[i]["photo"],
+					lat: source[i]["lat"],
+					long: source[i]["long"],
+					placeName: source[i]["placeName"],
+					review: source[i]["review"],
+					price: source[i]["price"],
+					address: source[i]["address"],
+					location: location,
+					sw4: source[i]["sw4"],
+					sw11: source[i]["sw11"],
+					sw12: source[i]["sw12"],
+					telephone: source[i]["telephone"],
+					website: source[i]["website"],
+					description: source[i]["description"],
+					type: source[i]["type"],
+					tag1: source[i]["tag1"],
+					tag2: source[i]["tag2"],
+					tag3: source[i]["tag3"],
+					subcategory: source[i]["subcategory"],
+					amenities: source[i]["amenities"],
+					tags: tags
+				};
+	
+				await Places.create(oneRow).then((res) => {
+					console.log(`Inserted row number ${t}`);
+				}).catch((err) => {
+					console.log(err);
+				});
+
 				t++;
-				console.log(tags);
-
-				// if (source[i]["sw4"] == 1) {
-				// 	var location = "Clapham"
-				// } else if (source[i]["sw11"] == 1) {
-				// 	var location = "Clapham Junction & Battersea"
-				// } else if (source[i]["sw12"] == 1) {
-				// 	var location = "Clapham South & Balham"
-				// } else {
-				// 	var location = "unknown"
-				// }
-
-				// var oneRow = {
-				// 	placeId: source[i]["placeId"],
-				// 	photo: source[i]["photo"],
-				// 	lat: source[i]["lat"],
-				// 	long: source[i]["long"],
-				// 	placeName: source[i]["placeName"],
-				// 	review: source[i]["review"],
-				// 	price: source[i]["price"],
-				// 	address: source[i]["address"],
-				// 	location: location,
-				// 	sw4: source[i]["sw4"],
-				// 	sw11: source[i]["sw11"],
-				// 	sw12: source[i]["sw12"],
-				// 	telephone: source[i]["telephone"],
-				// 	website: source[i]["website"],
-				// 	description: source[i]["description"],
-				// 	type: source[i]["type"],
-				// 	tag1: source[i]["tag1"],
-				// 	tag2: source[i]["tag2"],
-				// 	tag3: source[i]["tag3"],
-				// 	subcategory: source[i]["subcategory"],
-				// 	amenities: source[i]["amenities"],
-				// 	tags: tags
-				// };
-				// console.log(oneRow);
 			}
-		});
-		// 	if(collection) {
-		// 		collection.drop(function(err, delOK) {
-		// 			if (err) throw err;
-		// 			if (delOK) console.log("Collection deleted");
-		// 		});
-		// 	}
 
-		// 	collection.insertMany(arrayToInsert, (err, result) => {
-		// 		if (err) console.log(err);
-		// 		if(result){
-		// 			console.log("Import CSV into database successfully.");
-		// 		}
-		// 	});
-		// });
+		});
 		
 		
 	}).catch(err => {
-		console.log("DB Connection Error: ${err.message}");
+		console.log(`DB Connection Error: ${err.message}`);
 	});
 
 

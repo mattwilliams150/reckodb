@@ -27,4 +27,6 @@ var placesSchema = mongoose.Schema({
     posTags: {type: Object}
 });
 
-module.exports = mongoose.model('Places', placesSchema);
+const Places = mongoose.model('Places', placesSchema);
+
+module.exports = Places;

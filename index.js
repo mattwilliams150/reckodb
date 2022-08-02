@@ -9,7 +9,6 @@ const Places = require('./models/places.js');
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(async (res) => {
 		console.log('DB Connected!');
-		
 		// CSV file name
 		const fileName = "places.csv";
 		var arrayToInsert = [];
